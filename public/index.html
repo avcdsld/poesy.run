@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>p5.jsの詩的な雪</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&family=Noto+Serif+JP:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<script>
+// p5.jsのコードをここに挿入しますが、preload関数でフォントを読み込む部分を変更します
+
+let words = [
+	"snow", // 英語
+	"nieve", // スペイン語
+	"neige", // フランス語
+	"schnee", // ドイツ語
+	"neve", // イタリア語, 
+	"снег", // ロシア語
+	"雪", // 日本語
+	"xuě", // 中国語
+	"nun", // 韓国語
+  "눈", // 韓国語
+	"ثلج", // アラビア語
+	"बर्फ", // ヒンディー語
+	"তুষার", // ベンガル語
+	"kar", // トルコ語
+	"snö", // スウェーデン語
+	"snø", // ノルウェー語
+	"sne", // デンマーク語
+	"lumi", // フィンランド語
+	"sneeuw", // オランダ語
+	"śnieg", // ポーランド語
+	"sníh", // チェコ語
+	"sneh", // スロバキア語
+	"hó", // ハンガリー語
+	"ﾕｷ", // 日本語
+];
+
+let skyTop, skyBottom;
+let snowflakes = [];
+let fonts;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textSize(32);
+  skyTop = color(135, 206, 250);
+  skyBottom = color(255, 255, 255);
+  fonts = [
+		'Noto Sans JP',
+    'Noto Serif JP',
+	];
+}
+
+function draw() {
+  for(let y = 0; y < height; y++){
+    let inter = map(y, 0, height, 0, 1);
+    let c = lerpColor(skyTop, skyBottom, inter);
+    stroke(c);
+    line(0, y, width, y);
+  }
+  
+  if (frameCount % 30 == 0) {
+    let newFlake = {
+      x: random(width),
+      originalX: random(width),
+      y: 0,
+      size: random(24, 32),
+      speed: random(0.5, 1),
+      word: generateWord(),
+      lifetime: random(500, 1000),
+      angle: random(TWO_PI),
+      swing: random(10, 30),
+      font1Index: random([0, 1]),
+			font2Index: random([0, 1]),
+    };
+    snowflakes.push(newFlake);
+  }
+
+  for (let i = snowflakes.length - 1; i >= 0; i--) {
+    let flake = snowflakes[i];
+    flake.y += flake.speed;
+    flake.lifetime -= 1;
+    flake.x = flake.originalX + sin(flake.angle) * flake.swing;
+		flake.angle += noise(i * 0.01) * 0.05;
+
+    noStroke();
+    fill(233, 238, 243, 255 * flake.lifetime / 1000 + 50);
+		textFont(fonts[flake.font1Index]);
+    text(flake.word.firstHalf, flake.x, flake.y);
+    
+    fill(255, 250, 250, 255 * flake.lifetime / 1000 + 50);
+		textFont(fonts[flake.font2Index]);
+		text(flake.word.word2, flake.x + textWidth(flake.word.firstHalf), flake.y);
+    
+    fill(233, 238, 243, 255 * flake.lifetime / 1000 + 50);
+		textFont(fonts[flake.font1Index]);
+		text(flake.word.secondHalf, flake.x + textWidth(flake.word.firstHalf) + textWidth(flake.word.word2), flake.y);
+
+    if (flake.y > height + 20 || flake.lifetime <= 0) {
+      snowflakes.splice(i, 1);
+    }
+  }
+}
+
+function generateWord() {
+  let word1, word2;
+  do {
+    word1 = words[Math.floor(Math.random() * words.length)] // .replaceAll('e', ':');
+  } while (word1.length <= 1);
+  do {
+		word2 = words[Math.floor(Math.random() * words.length)] // .replaceAll('e', ':');
+	} while (word2 === word1);
+  let firstHalf = word1.substring(0, Math.ceil(word1.length / 2));
+  let secondHalf = word1.substring(Math.ceil(word1.length / 2));
+  return {firstHalf, secondHalf, word2};
+}
+</script>
+</body>
+</html>
