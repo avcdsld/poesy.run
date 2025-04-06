@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptual Hanami</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: "Courier New", monospace;
+    }
+
+    .color-code {
+      position: absolute;
+      font-size: 16px;
+      color: #000;
+      opacity: 0;
+      animation: falling linear infinite;
+      user-select: none;
+    }
+
+    .tanka {
+      position: relative;
+      font-size: 20px;
+      line-height: 1.6;
+      color: #000;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .tanka div {
+      position: relative;
+      height: 30px;
+      margin: 2px 0;
+      width: 120px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tanka div span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      opacity: 1;
+      transition: opacity 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    @keyframes falling {
+      0% {
+        transform: translateY(-15vh) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px);
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(110vh) translateX(-20px);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tanka">
+  <div><span>#f3e8e4</span></div>
+  <div><span>#d3a7a7</span></div>
+  <div><span>#cc9fa2</span></div>
+  <div><span>#eccfd1</span></div>
+  <div><span>#f3d3d4</span></div>
+</div>
+
+<script>
+  const baseColors = ['#f3e8e4', '#d3a7a7', '#cc9fa2', '#eccfd1', '#f3d3d4', '#88b04b', '#a2c523', '#769164', '#6a8d51', '#b3c890'];
+
+  function slightlyAdjustColor(hex) {
+    const adjust = (c) => {
+      let v = parseInt(c, 16);
+      v = Math.min(255, Math.max(0, v + Math.floor(Math.random() * 9 - 4)));
+      return v.toString(16).padStart(2, '0');
+    };
+    return '#' + adjust(hex.substr(1,2)) + adjust(hex.substr(3,2)) + adjust(hex.substr(5,2));
+  }
+
+  function createColorCode() {
+    const span = document.createElement('span');
+    span.classList.add('color-code');
+    const baseColor = baseColors[Math.floor(Math.random() * baseColors.length)];
+    span.textContent = slightlyAdjustColor(baseColor);
+    span.style.left = Math.random() * 100 + 'vw';
+    span.style.animationDuration = (8 + Math.random() * 10) + 's';
+    span.style.animationDelay = (Math.random() * -20) + 's';
+    document.body.appendChild(span);
+
+    setTimeout(() => {
+      span.remove();
+    }, 20000);
+  }
+
+  setInterval(createColorCode, 1500);
+
+  function updateSingleTankaColor() {
+    const tankaDivs = document.querySelectorAll('.tanka div');
+    const targetDiv = tankaDivs[Math.floor(Math.random() * tankaDivs.length)];
+    const oldSpan = targetDiv.querySelector('span');
+    const newSpan = document.createElement('span');
+
+    const oldColor = oldSpan.textContent;
+    newSpan.textContent = slightlyAdjustColor(oldColor);
+    newSpan.style.opacity = '0';
+    targetDiv.appendChild(newSpan);
+
+    setTimeout(() => {
+      newSpan.style.opacity = '1';
+    }, 50);
+
+    setTimeout(() => {
+      oldSpan.style.opacity = '0';
+    }, 800);
+
+    setTimeout(() => {
+      oldSpan.remove();
+    }, 2500);
+  }
+
+  setInterval(updateSingleTankaColor, 3000);
+</script>
+
+</body>
+</html>
